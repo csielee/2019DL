@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
 def generate_linear(n=100):
     pts = np.random.uniform(0, 1, (n, 2))
@@ -30,8 +32,6 @@ def generate_XOR_easy(n=11):
     return np.array(inputs), np.array(labels).reshape(n*2 - 1,1)
 
 def show_result(x, y, pred_y):
-    import matplotlib.pyplot as plt
-    from matplotlib.colors import LinearSegmentedColormap
     cm = LinearSegmentedColormap.from_list(
         'mymap', [(1, 0, 0), (0, 0, 1)], N=2)
     plt.figure(figsize=(10,5))
@@ -42,6 +42,18 @@ def show_result(x, y, pred_y):
     plt.subplot(1,2,2)
     plt.title('Predict result', fontsize=18)
     plt.scatter(x[:,0], x[:,1], c=pred_y[:,0], cmap=cm)
+    
+    plt.show()
+    
+def show_data(xs, ys, ts):
+    cm = LinearSegmentedColormap.from_list(
+        'mymap', [(1, 0, 0), (0, 0, 1)], N=2)
+    n = len(xs)
+    plt.figure(figsize=(5*n, 5))
+    for i, x, y, t in zip(range(n), xs, ys, ts):
+        plt.subplot(1,n, i+1)
+        plt.title(t, fontsize=18)
+        plt.scatter(x[:,0], x[:,1], c=y[:,0], cmap=cm)
     
     plt.show()
     

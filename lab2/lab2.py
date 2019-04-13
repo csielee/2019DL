@@ -88,7 +88,7 @@ class EEGNet(nn.Module):
     
 from functools import reduce
 class DeepConvNet(nn.Module):
-    def __init__(self, activation=None, deepconv=[25,50,100,200]):
+    def __init__(self, activation=None, deepconv=[25,50,100,200], dropout=0.5):
         super(DeepConvNet, self).__init__()
         
         if not activation:
@@ -107,7 +107,7 @@ class DeepConvNet(nn.Module):
             nn.BatchNorm2d(deepconv[0]),
             activation(),
             nn.MaxPool2d(kernel_size=(1,2)),
-            nn.Dropout(p=0.5)
+            nn.Dropout(p=dropout)
         )
         
         for idx in range(1, len(deepconv)):
@@ -119,7 +119,7 @@ class DeepConvNet(nn.Module):
                 nn.BatchNorm2d(deepconv[idx]),
                 activation(),
                 nn.MaxPool2d(kernel_size=(1, 2)),
-                nn.Dropout(p=0.5)
+                nn.Dropout(p=dropout)
             ))
         
         

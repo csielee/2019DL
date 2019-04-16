@@ -17,7 +17,7 @@ def getData(mode):
 
 
 class RetinopathyDataset(data.Dataset):
-    def __init__(self, root, mode):
+    def __init__(self, root, mode, augmentation=None):
         """
         Args:
             root (string): Root path of the dataset.
@@ -29,6 +29,11 @@ class RetinopathyDataset(data.Dataset):
         self.root = root
         self.img_name, self.label = getData(mode)
         self.mode = mode
+        trans = []
+        if augmentation:
+            trans += augmentation
+        trans += [transforms.ToTensor()]
+        self.transforms = transforms.Compose(trans)
         print("> Found %d images..." % (len(self.img_name)))
 
     def __len__(self):
@@ -57,7 +62,7 @@ class RetinopathyDataset(data.Dataset):
         """
         path = os.path.join(self.root, self.img_name[index] + '.jpeg')
         img = PIL.Image.open(path)
-        img = transforms.ToTensor()(img)
+        img = self.transforms(img)
         
         label = self.label[index]
         

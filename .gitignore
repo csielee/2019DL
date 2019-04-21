@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 
 lab3/data
+lab3/*

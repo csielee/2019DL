@@ -222,70 +222,110 @@ class RNN():
         self.c.zero_grad()
     
     def step(self, lr=1e-1):
+        if lr is None:
+            lr = 1e-2
         self.U.data -= lr * self.U.grad
         self.W.data -= lr * self.W.grad
         self.V.data -= lr * self.V.grad
         self.b.data -= lr * self.b.grad
         self.c.data -= lr * self.c.grad
 
+def train(model, digits, epoch_size, lr=None, show_size=1000):
+    dataset = BinaryDataset(digits)
+    
+    all_error = []
+    all_loss = []
+    all_accuracy = []
+    
+    for epoch in range(epoch_size):
+        x, y = next(dataset)
+        
+        model.zero_grad()
+        output = model.forward(x)
+        loss = [output[i].crossentropy(y[i]) for i in range(len(y))]
+        
+        for l in loss[::-1]:
+            l.backward(np.array(1))
+            
+        model.step(lr)
+        
+        e = np.count_nonzero([np.all(output[i].argsoftmax().data != y[i].data) for i in range(len(y))])
+        all_error.append(e)
+        all_loss.append(sum([l.data for l in loss]))
+        
+        if e == 0:
+            all_accuracy.append(1)
+        else:
+            all_accuracy.append(0)
+        
+        if (epoch+1) % show_size == 0:
+            print('[{:5d}] error : {}, loss : {}'.format(epoch+1, sum(all_error[-show_size:])/show_size, sum(all_loss[-show_size:])/show_size ))
+        
+    return all_error, all_loss, all_accuracy
+
+def evaluation(model, digits, epoch_size, show_size):
+    accuracy = 0
+    
+    all_error = []
+    all_accuracy = []
+
+    eval_dataset = BinaryDataset(digits)
+
+    for epoch in range(epoch_size):
+        x, y = next(eval_dataset)
+    
+        output = model.forward(x)
+    
+        e = np.count_nonzero([np.all(output[i].argsoftmax().data != y[i].data) for i in range(len(y))])
+        all_error.append(e)
+        
+        if e == 0:
+            all_accuracy.append(1)
+        else:
+            all_accuracy.append(0)
+    
+        output = [float(o.argsoftmax().data) for o in output]\
+    
+        x = np.concatenate([v.data for v in x]).T
+        y = np.concatenate([v.data for v in y]).T
+        
+        if (epoch+1) % show_size == 0:
+            print('[{:5d}] error : {}\t{:d} + {:d} = {:d}, model:{:d}'.format(
+                epoch+1, sum(all_error[-show_size:])/show_size,
+                toNumber(x[0,:]), toNumber(x[1, :]), toNumber(y[0,:]), toNumber(output)
+            ))
+    
+    accuracy =  sum(all_accuracy) / epoch_size
+    if show_size < epoch_size:
+        print('Accuracy : {:.3f}%'.format(accuracy))
+    
+    return accuracy, all_error, all_accuracy
+
+
+def show(all_accuracy, mean_size=1000):
+    x = [((i+0.5)*mean_size) for i in range(len(all_accuracy)//mean_size)]
+    y = [sum(all_accuracy[i*mean_size:(i+1)*mean_size])/ mean_size for i in range(len(all_accuracy)//mean_size)]
+    
+    plt.figure(figsize=(10,6))
+    plt.title('Episode Accuracy')
+    plt.xlabel('Episode')
+    plt.ylabel('Accuracy')
+    plt.plot(x, y, '-o', label='accuracy')
+    
+    plt.xlim((0, len(all_accuracy)))
+    plt.xticks(x)
+    plt.legend()
+    plt.show()
+
+
 model = RNN(2, 2, 16)
 
-dataset = BinaryDataset(8)
 
-epoch_size = 20000
-
-error = 0
-
-all_error = []
-all_loss = []
 
 print('Training ... ')
-for epoch in range(epoch_size):
-    x, y = next(dataset)
-    
-    model.zero_grad()
-    
-    output = model.forward(x)
-    
-    loss = [output[i].crossentropy(y[i]) for i in range(len(y))]
-    
-    for l in loss[::-1]:
-        l.backward(np.array(1))
-        
-    model.step(1e-2)
-    
-    e = np.count_nonzero([np.all(output[i].argsoftmax().data != y[i].data) for i in range(len(y))])
-    error += e
-    all_error.append(e)
-    all_loss.append(sum([l.data for l in loss]))
-    
-    if (epoch+1) % 1000 == 0:
-        print('[{:5d}] error : {}, loss : {}'.format(epoch+1, error / 1000, all_loss[-1]))
-        error = 0
+_, _, a = train(model, 8, 20000)
+
+show(a[:10000])
 
 print('Evaluation ...')
-eval_size = 1000
-
-error = 0
-accuracy = 0
-
-eval_dataset = BinaryDataset(8)
-
-for i in range(eval_size):
-    x, y = next(eval_dataset)
-    
-    output = model.forward(x)
-    
-    e = np.count_nonzero([np.all(output[i].argsoftmax().data != y[i].data) for i in range(len(y))])
-    error += e
-    
-    if e == 0:
-        accuracy += 1
-    
-    output = [float(o.argsoftmax().data) for o in output]
-    
-    x = np.concatenate([v.data for v in x]).T
-    y = np.concatenate([v.data for v in y]).T
-    
-    print('[{:4d}] {:d} + {:d} = {:d}, model:{}'.format(i, toNumber(x[0,:]), toNumber(x[1, :]), toNumber(y[0,:]), toNumber(output)))
-print('Error : {:.3f}, Accuracy : {:.3f}%'.format(error/eval_size, accuracy / eval_size))
+evaluation(model, 8, 1000, 100)

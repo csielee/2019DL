@@ -1,0 +1,125 @@
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+ 
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+%\usepackage[spanish]{babel} %Castellanización
+\usepackage[T1]{fontenc} %escribe lo del teclado
+\usepackage{inputenc} %Reconoce algunos símbolos
+\usepackage{lmodern} %optimiza algunas fuentes
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+\usepackage{hyperref} % Uso de links
+
+% To Display Chinese words
+\usepackage{xeCJK}
+% To Display Code
+% \usepackage{listings}
+\usepackage{minted}
+% To Display csv file
+\usepackage{csvsimple}
+\usepackage{longtable}
+\usepackage{booktabs}
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\newenvironment{solution}{\begin{proof}[Solution]}{\end{proof}}
+
+% write csv content in latex 
+\begin{filecontents*}{grade.csv}
+name,givenname,matriculation,gender,grade
+Maier,Hans,12345,m,1.0
+Huber,Anna,23456,f,2.3
+Weisbaeck,Werner,34567,m,5.0
+\end{filecontents*}
+ 
+\begin{document}
+ 
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+ 
+\title{2019 Deep Learning and Practice \\ Lab x -- xxx}
+\author{0756110 李東霖}
+
+\maketitle
+\section{Introduction}
+
+\begin{figure}[H]
+\centering
+% \includegraphics[width=\linewidth]{path/to/image} 
+\caption{figure description}
+\end{figure}
+
+\section{Experiment setup}
+
+% display code
+\begin{minted}[frame=lines, breaklines]{python}
+import numpy as np
+
+np.arange(10)
+
+iamlongnamevariablewithlongvalue = "iamverylongsoneedtobreaklineintoarticlewowowowowowwowowow"
+\end{minted}
+
+% display inline
+\verb|I am inline code|
+
+% display equation
+\begin{equation}
+\label{trick}
+z = z^* * \exp(logvar/2) + mean
+\end{equation} 
+
+% use reference
+I use equation reference ( \ref{trick} )
+
+\section{Experimental results}
+
+% display csv content
+% \csvautotabular{path/to/csv.csv}
+
+% display content in latex
+\ \par
+This table
+\par
+\csvautotabular{grade.csv}
+\par \ \par
+
+This book table with caption
+\par
+\begin{table}[H]
+    \centering
+    \csvautobooktabular{grade.csv}
+    \caption{Hi i am caption}
+    \label{tab:my_label}
+\end{table}
+
+
+\section{Discussion}
+
+% --------------------------------------------------------------
+%     You don't have to mess with anything below this line.
+% --------------------------------------------------------------
+ 
+\end{document}
